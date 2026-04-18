@@ -1,5 +1,7 @@
 package client;
 
+import model.BlindsStatus;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -7,7 +9,7 @@ import java.io.PrintWriter;
 import java.net.DatagramPacket;
 import java.net.Socket;
 
-public class ClientSocketManagerTCP implements ClientSocket
+public class ClientSocketManagerTCP implements BlindsClient
 {
   private Socket socket;
   private BufferedReader in;
@@ -69,12 +71,38 @@ public class ClientSocketManagerTCP implements ClientSocket
     }
   }
 
-  @Override public void send(String message, String value)
+  @Override public void send(BlindsStatus status)
   {
+    String message = status.name();
     byte[] sendData = message.getBytes();
 
     DatagramPacket packet = new DatagramPacket(sendData, sendData.length);
 
+  }
+
+  @Override public void receiveCommand()
+  {
+    try {
+      BufferedReader in = new BufferedReader(
+          new InputStreamReader(socket.getInputStream())
+      );
+
+      String command;
+      while ((command = in.readLine()) != null) {
+        switch (command) {
+          case "OPEN"   -> {
+            // fysisk åbn persiennen
+            send(BlindsStatus.OPEN);   // kvitter tilbage til server
+          }
+          case "CLOSE" -> {
+            // fysisk luk persiennen
+            send(BlindsStatus.CLOSED); // kvitter tilbage til server
+          }
+        }
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
 }
