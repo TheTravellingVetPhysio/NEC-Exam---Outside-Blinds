@@ -15,7 +15,6 @@ public class BlindsService
   private static final double TEMPERATURE_LIMIT = 25; // temperatur i celcius
   private static final double SUN_LIMIT = 50000; // lux
   private static final double WIND_LIMIT = 10; // m/s
-  private static final double WIND_GUST_LIMIT = 13;
 
   // Vindhistorik (for at undgå høje vindstød)
   private static final int WIND_HISTORY_SIZE = 30; // input 1 gang/minuttet
@@ -31,6 +30,16 @@ public class BlindsService
     }
   }
 
+  public boolean isBlindsDownAutomatic()
+  {
+    if (wind)
+    {
+      return false;
+    }
+
+    return false;
+  }
+
   private boolean isTemperatureTooHigh(Double value)
   {
     return value > TEMPERATURE_LIMIT;
@@ -43,7 +52,13 @@ public class BlindsService
 
   private boolean isWindTooStrong(Double value)
   {
-    // TO-DO
+    if (windHistory.size() >= WIND_HISTORY_SIZE)
+    {
+      windHistory.poll(); // fjern ældste fra køen
+    }
+    windHistory.add(value);
+    return
+        windHistory.stream().mapToDouble(Double::doubleValue).max().orElse(0.0)
+            > WIND_LIMIT;
   }
-
 }
