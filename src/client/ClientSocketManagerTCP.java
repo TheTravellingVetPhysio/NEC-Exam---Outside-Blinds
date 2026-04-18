@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.DatagramPacket;
 import java.net.Socket;
 
 public class ClientSocketManagerTCP implements ClientSocket
@@ -20,7 +21,7 @@ public class ClientSocketManagerTCP implements ClientSocket
     this.port = port;
   }
 
-  public void connect(String host, int port)
+  @Override public void connect(String host, int port)
   {
     // Disconnect from existing connection (if exist)
     if (socket != null && !socket.isClosed())
@@ -30,8 +31,10 @@ public class ClientSocketManagerTCP implements ClientSocket
     {
       // Create client socket, connect to server
       socket = new Socket(host, port);
+
       // Create input stream attached to the socket
       in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
       // Create output stream attached to the socket
       out = new PrintWriter(socket.getOutputStream(), true);
       //      System.out.println("Client established connection with server.");
@@ -43,7 +46,7 @@ public class ClientSocketManagerTCP implements ClientSocket
     }
   }
 
-  public void disconnect()
+  @Override public void disconnect()
   {
     try
     {
@@ -55,8 +58,8 @@ public class ClientSocketManagerTCP implements ClientSocket
         socket.close();
       //      System.out.println("Client closed connection with server.");
 
-      in     = null;
-      out    = null;
+      in = null;
+      out = null;
       socket = null;
     }
     catch (IOException e)
@@ -66,6 +69,12 @@ public class ClientSocketManagerTCP implements ClientSocket
     }
   }
 
+  @Override public void send(String message, String value)
+  {
+    byte[] sendData = message.getBytes();
 
+    DatagramPacket packet = new DatagramPacket(sendData, sendData.length);
+
+  }
 
 }

@@ -1,10 +1,11 @@
 package client;
 
 import java.io.IOException;
+import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
-public class ClientSocketManagerUDP
+public class ClientSocketManagerUDP implements ClientSocket
 {
   private DatagramSocket socket;
   private int port;
@@ -17,6 +18,7 @@ public class ClientSocketManagerUDP
     connect(host, port);
   }
 
+  @Override
   public void connect(String host, int port)
   {
     // Disconnect from existing connection (if exist)
@@ -39,10 +41,19 @@ public class ClientSocketManagerUDP
       System.out.println("Error: Client failed to setup address and port to server.");
     }
   }
+  @Override
   public void disconnect()
   {
     socket.close(); // In UDP, closing the socket is not informed to the server
     System.out.println("Client closed connection with server.");
+  }
+
+  @Override
+  public void send(String message, String value)
+  {
+    byte[] sendData = message.getBytes();
+    DatagramPacket packet = new DatagramPacket(sendData, sendData.length,
+        IPAddress, port);
   }
 
 }
