@@ -31,6 +31,19 @@ public class BlindsService
     }
   }
 
-  private void isTemperatureTooHigh(value)
+  private boolean isTemperatureTooHigh(Double value)
+  {
+    return value > TEMPERATURE_LIMIT;
+  }
+
+  private boolean isSunTooStrong(Double value)
+  {
+    return value > SUN_LIMIT;
+  }
+
+  private boolean isWindTooStrong(Double value)
+  {
+    // TO-DO
+  }
 
 }
