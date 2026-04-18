@@ -87,4 +87,9 @@ public class BlindsService
   public double getSun()         { return currentSun; }
   public double getWind()        { return currentWind; }
   public BlindsMode getMode()    { return mode; }
+
+  // Set mode
+  public void setManualUp()   { mode = BlindsMode.MANUAL_UP; }
+  public void setManualDown() { mode = BlindsMode.MANUAL_DOWN; }
+  public void setAutomatic()  { mode = BlindsMode.AUTOMATIC; }
 }
