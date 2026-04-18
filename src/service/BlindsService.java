@@ -1,5 +1,6 @@
 package service;
 
+import model.BlindsMode;
 import model.SensorType;
 
 import java.util.LinkedList;
@@ -11,6 +12,10 @@ public class BlindsService
   private boolean sun;
   private boolean wind;
 
+  private double currentTemperature;
+  private double currentSun;
+  private double currentWind;
+
   // Grænseværdier
   private static final double TEMPERATURE_LIMIT = 25; // temperatur i celcius
   private static final double SUN_LIMIT = 50000; // lux
@@ -20,24 +25,39 @@ public class BlindsService
   private static final int WIND_HISTORY_SIZE = 30; // input 1 gang/minuttet
   private final Queue<Double> windHistory = new LinkedList<>();   // Queue er et interface, der virker med "First in, first out", så en "automatisk" udskiftende arrayliste..
 
+  private BlindsMode mode = BlindsMode.AUTOMATIC;
+
   public void sensorData(SensorType type, double value)
   {
     switch (type)
     {
-      case TEMPERATURE -> temperature = isTemperatureTooHigh(value);
-      case SUN -> sun = isSunTooStrong(value);
-      case WIND -> wind = isWindTooStrong(value);
+      case TEMPERATURE -> {
+        currentTemperature = value;
+        temperature = isTemperatureTooHigh(value);
+      }
+      case SUN -> {
+        currentSun = value;
+        sun = isSunTooStrong(value);
+      }
+      case WIND -> {
+        currentWind = value;
+        wind = isWindTooStrong(value);
+        if (wind) mode = BlindsMode.AUTOMATIC;
+      }
     }
+  }
+
+  public boolean isBlindsDown() {   // metoden serveren skal kalde
+    return switch (mode) {
+      case MANUAL_DOWN -> true;
+      case MANUAL_UP   -> false;
+      case AUTOMATIC   -> isBlindsDownAutomatic();
+    };
   }
 
   public boolean isBlindsDownAutomatic()
   {
-    if (wind)
-    {
-      return false;
-    }
-
-    return false;
+    return sun && temperature && !wind;   // Persiennen kører kun ned hvis der er sol, det er varmt og der ikke er vind
   }
 
   private boolean isTemperatureTooHigh(Double value)
@@ -61,4 +81,10 @@ public class BlindsService
         windHistory.stream().mapToDouble(Double::doubleValue).max().orElse(0.0)
             > WIND_LIMIT;
   }
+
+  // Getters
+  public double getTemperature() { return currentTemperature; }
+  public double getSun()         { return currentSun; }
+  public double getWind()        { return currentWind; }
+  public BlindsMode getMode()    { return mode; }
 }
