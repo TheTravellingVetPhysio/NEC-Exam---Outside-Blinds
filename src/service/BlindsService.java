@@ -31,4 +31,6 @@ public class BlindsService
     }
   }
 
+  private void isTemperatureTooHigh(value)
+
 }
