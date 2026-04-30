@@ -1,27 +1,19 @@
-import client.ClientSocket;
 import client.ClientSocketManagerUDP;
-
-import java.util.Scanner;
+import model.SensorType;
 
 public class MainClientUDP
 {
-  public static void main(String[] args)
+  public static void main(String[] args) throws InterruptedException
   {
-    // Create client socket
-    ClientSocket socket = new ClientSocketManagerUDP("localhost", 6789);
-
-    // Create keyboard input stream
-    Scanner input = new Scanner(System.in);
+    ClientSocketManagerUDP socket = new ClientSocketManagerUDP("localhost", 6789);
 
     while (true)
     {
-      System.out.print("Write a line for the server: ");
-      String request = input.nextLine();  // Read line from keyboard
+      socket.send(SensorType.TEMPERATURE, 26.5);
+      socket.send(SensorType.SUN, 60000.0);
+      socket.send(SensorType.WIND, 5.0);
 
-      String reply = socket.toUppercase(request);
-      System.out.println("Sever replied: " + reply);
+      Thread.sleep(10000); // Send én gang pr 10 sekunder
     }
-
-    // socket.disconnect();  // Close socket
   }
 }

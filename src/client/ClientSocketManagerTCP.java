@@ -1,16 +1,17 @@
 package client;
 
 import model.BlindsStatus;
+import shared.listener.BlindsUIListener;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.DatagramPacket;
 import java.net.Socket;
 
 public class ClientSocketManagerTCP implements BlindsClient
 {
+  private BlindsUIListener listener;
   private Socket socket;
   private BufferedReader in;
   private PrintWriter out;
@@ -21,6 +22,12 @@ public class ClientSocketManagerTCP implements BlindsClient
   {
     this.host = host;
     this.port = port;
+    connect(host, port);
+  }
+
+  public void addListener(BlindsUIListener listener)
+  {
+    this.listener = listener;
   }
 
   @Override public void connect(String host, int port)
@@ -43,8 +50,7 @@ public class ClientSocketManagerTCP implements BlindsClient
     }
     catch (IOException e)
     {
-      System.out.println(
-          "Error: Client failed to establish connection to server.");
+      System.out.println("Error: Client failed to establish connection to server.");
     }
   }
 
@@ -60,49 +66,55 @@ public class ClientSocketManagerTCP implements BlindsClient
         socket.close();
       //      System.out.println("Client closed connection with server.");
 
-      in = null;
-      out = null;
+      in     = null;
+      out    = null;
       socket = null;
     }
     catch (IOException e)
     {
-      System.out.println(
-          "Error: Client failed to close the connection to server.");
+      System.out.println("Error: Client failed to close the connection to server.");
     }
   }
 
   @Override public void send(BlindsStatus status)
   {
-    String message = status.name();
-    byte[] sendData = message.getBytes();
-
-    DatagramPacket packet = new DatagramPacket(sendData, sendData.length);
+    out.println(status.name());
 
   }
 
   @Override public void receiveCommand()
   {
-    try {
-      BufferedReader in = new BufferedReader(
-          new InputStreamReader(socket.getInputStream())
-      );
-
-      String command;
-      while ((command = in.readLine()) != null) {
-        switch (command) {
-          case "OPEN"   -> {
-            // fysisk åbn persiennen
-            send(BlindsStatus.OPEN);   // kvitter tilbage til server
-          }
-          case "CLOSE" -> {
-            // fysisk luk persiennen
-            send(BlindsStatus.CLOSED); // kvitter tilbage til server
+    new Thread(() -> {
+      try
+      {
+        String command;
+        while ((command = in.readLine()) != null)
+        {
+          switch (command)
+          {
+            case "OPEN" ->
+            {
+              // fysisk åbn persiennen
+              if (listener != null)
+                listener.onBlindsChanged(BlindsStatus.OPEN); //  notificerer UI
+              send(BlindsStatus.OPEN);   // kvitter tilbage til server
+            }
+            case "CLOSE" ->
+            {
+              // fysisk luk persiennen
+              if (listener != null)
+                listener.onBlindsChanged(BlindsStatus.CLOSED); // notificerer UI
+              send(BlindsStatus.CLOSED); // kvitter tilbage til server
+            }
           }
         }
       }
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
+      catch (IOException e)
+      {
+        e.printStackTrace();
+      }
+    }).
 
+          start();
+  }
 }

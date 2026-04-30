@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane fitToWidth="true"
+            hbarPolicy="NEVER"
+            pannable="true"
+            styleClass="scroll-pane"
+            vbarPolicy="AS_NEEDED"
+            stylesheets="@/css/BlindsDashboard.css"
+            xmlns="http://javafx.com/javafx/25"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="presentation.view.MainController">
+
+    <content>
+        <StackPane>
+            <padding>
+                <Insets bottom="24.0" left="24.0" right="24.0" top="12.0" />
+            </padding>
+
+            <VBox fillWidth="true" maxWidth="980.0" spacing="24.0" styleClass="center-content">
+
+                <VBox spacing="8.0">
+                    <Label styleClass="welcome-title" text="Smart Blinds Dashboard" />
+                    <Label styleClass="welcome-subtitle"
+                           text="Monitor sensor values, view the current blind status, and switch between automatic and manual control."
+                           wrapText="true" />
+                </VBox>
+
+                <HBox spacing="20.0">
+                    <VBox prefWidth="220.0" spacing="8.0" styleClass="glass-card">
+                        <Label styleClass="card-label" text="Connection" />
+                        <Label fx:id="connectionLabel" styleClass="card-value" text="ONLINE" />
+                        <Label styleClass="card-positive" text="TCP client connected" />
+                    </VBox>
+
+                    <VBox prefWidth="220.0" spacing="8.0" styleClass="glass-card">
+                        <Label styleClass="card-label" text="Mode" />
+                        <Label fx:id="modeLabel" styleClass="card-value" text="AUTOMATIC" />
+                        <Label styleClass="card-muted" text="Current control mode" />
+                    </VBox>
+
+                    <VBox prefWidth="220.0" spacing="8.0" styleClass="glass-card">
+                        <Label styleClass="card-label" text="Blinds Status" />
+                        <Label fx:id="statusLabel" styleClass="card-value" text="CLOSED" />
+                        <Label styleClass="card-muted" text="Last confirmed state" />
+                    </VBox>
+                </HBox>
+
+                <HBox fillHeight="true" spacing="20.0">
+                    <VBox maxWidth="360.0" prefWidth="360.0" spacing="16.0" styleClass="glass-card-large">
+                        <Label styleClass="overview-title" text="Manual Control" />
+                        <Label styleClass="overview-text"
+                               text="Use manual controls when you want to override the automatic sensor-based logic."
+                               wrapText="true" />
+
+                        <Separator opacity="0.18" />
+
+                        <VBox spacing="12.0">
+                            <Button maxWidth="Infinity"
+                                    onAction="#handleManualUp"
+                                    styleClass="action-button-secondary"
+                                    text="Open Blinds" />
+
+                            <Button maxWidth="Infinity"
+                                    onAction="#handleManualDown"
+                                    styleClass="action-button-primary"
+                                    text="Close Blinds" />
+
+                            <Button maxWidth="Infinity"
+                                    onAction="#handleAutomatic"
+                                    styleClass="action-button-secondary"
+                                    text="Enable Automatic Mode" />
+                        </VBox>
+
+                        <VBox spacing="10.0" styleClass="summary-mini-box">
+                            <HBox spacing="12.0">
+                                <Label styleClass="table-header" text="Command:" />
+                                <Region HBox.hgrow="ALWAYS" />
+                                <Label fx:id="lastCommandLabel" styleClass="table-cell-strong" text="-" />
+                            </HBox>
+
+                            <HBox spacing="12.0">
+                                <Label styleClass="table-header" text="Reason:" />
+                                <Region HBox.hgrow="ALWAYS" />
+                                <Label fx:id="reasonLabel" styleClass="table-cell" text="Waiting for data" />
+                            </HBox>
+                        </VBox>
+                    </VBox>
+
+                    <VBox spacing="16.0" styleClass="glass-card-large" HBox.hgrow="ALWAYS">
+                        <HBox alignment="CENTER_LEFT" spacing="12.0">
+                            <Label styleClass="overview-title" text="Live Blinds Preview" />
+                            <Region HBox.hgrow="ALWAYS" />
+                            <Label styleClass="card-muted" text="Updated from TCP status" />
+                        </HBox>
+
+                        <StackPane minHeight="280.0" prefHeight="320.0" styleClass="blinds-preview">
+                            <VBox alignment="CENTER" spacing="14.0">
+                                <Label fx:id="blindsIconLabel" styleClass="blinds-icon" text="▥" />
+                                <Label fx:id="blindsTextLabel" styleClass="blinds-state-text" text="Blinds are closed" />
+                            </VBox>
+                        </StackPane>
+                    </VBox>
+                </HBox>
+
+                <HBox spacing="20.0">
+                    <VBox prefWidth="300.0" spacing="10.0" styleClass="glass-card-large">
+                        <Label styleClass="overview-title" text="Temperature" />
+                        <Label fx:id="temperatureLabel" styleClass="sensor-value" text="0.0 °C" />
+                        <Label styleClass="overview-text" text="Limit: 25 °C" />
+                    </VBox>
+
+                    <VBox prefWidth="300.0" spacing="10.0" styleClass="glass-card-large">
+                        <Label styleClass="overview-title" text="Sunlight" />
+                        <Label fx:id="sunLabel" styleClass="sensor-value" text="0 lux" />
+                        <Label styleClass="overview-text" text="Limit: 50,000 lux" />
+                    </VBox>
+
+                    <VBox prefWidth="300.0" spacing="10.0" styleClass="glass-card-large">
+                        <Label styleClass="overview-title" text="Wind" />
+                        <Label fx:id="windLabel" styleClass="sensor-value" text="0.0 m/s" />
+                        <Label styleClass="overview-text" text="Limit: 10 m/s" />
+                    </VBox>
+                </HBox>
+
+                <VBox spacing="14.0" styleClass="glass-card-large">
+                    <HBox alignment="CENTER_LEFT" spacing="12.0">
+                        <Label styleClass="overview-title" text="System Log" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Label styleClass="card-muted" text="Recent TCP/UDP events" />
+                    </HBox>
+
+                    <ListView fx:id="logListView"
+                              minHeight="160.0"
+                              prefHeight="190.0"
+                              styleClass="log-list-view" />
+                </VBox>
+            </VBox>
+        </StackPane>
+    </content>
+</ScrollPane>

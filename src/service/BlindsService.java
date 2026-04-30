@@ -2,12 +2,15 @@ package service;
 
 import model.BlindsMode;
 import model.SensorType;
+import shared.listener.BlindsStateListener;
 
 import java.util.LinkedList;
 import java.util.Queue;
 
 public class BlindsService
 {
+  private BlindsStateListener listener;
+
   private boolean temperature;
   private boolean sun;
   private boolean wind;
@@ -27,6 +30,20 @@ public class BlindsService
 
   private BlindsMode mode = BlindsMode.AUTOMATIC;
 
+
+  public void setListener(BlindsStateListener listener)
+  {
+    this.listener = listener;
+  }
+
+  private void notifyListener()
+  {
+    if (listener != null)
+    {
+      listener.onStateChanged(isBlindsDown());
+    }
+  }
+
   public void sensorData(SensorType type, double value)
   {
     switch (type)
@@ -45,6 +62,7 @@ public class BlindsService
         if (wind) mode = BlindsMode.AUTOMATIC;
       }
     }
+    notifyListener();
   }
 
   public boolean isBlindsDown() {   // metoden serveren skal kalde

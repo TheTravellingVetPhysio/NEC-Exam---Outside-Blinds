@@ -18,7 +18,7 @@ public class SunSimulator implements SensorSimulator
 
   @Override public SensorType getType()
   {
-    return SensorType.SOL;
+    return SensorType.SUN;
   }
 
 }

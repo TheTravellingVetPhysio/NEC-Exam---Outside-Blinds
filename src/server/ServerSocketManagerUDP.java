@@ -1,80 +1,76 @@
 package server;
 
+import model.BlindsStatus;
+import model.SensorType;
+import service.BlindsService;
 import shared.logger.Logger;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
 
 public class ServerSocketManagerUDP
 {
-  private final int DATAGRAM_SIZE = 20;
-  private Logger logger;
+  private final BlindsService blindsService;
+  private final ServerSocketManagerTCP serverSocketManagerTCP;
+  private final int port;
 
-  public ServerSocketManagerUDP(int port)
+  private boolean lastBlindsState = false;
+  private final int DATAGRAM_SIZE = 32;
+
+  public ServerSocketManagerUDP(int port, BlindsService blindsService,
+                                ServerSocketManagerTCP serverSocketManagerTCP)
   {
-    System.out.println("Starting Server...");
+    this.port = port;
+    this.blindsService          = blindsService;
+    this.serverSocketManagerTCP = serverSocketManagerTCP;
+
+    new Thread(this::run).start();
+  }
+
+  public void run()
+  {
+    System.out.println("Starting server...");
     try
     {
-      // Create UDP server socket at port
       DatagramSocket serverSocket = new DatagramSocket(port);
-
-      // Specify the size for receiving datagrams
-      byte[] receiveData = new byte[DATAGRAM_SIZE];
 
       while (true)
       {
-        DatagramPacket receivePacket = null;
+        byte[] receiveData = new byte[DATAGRAM_SIZE];
+        DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+        System.out.println("Waiting for a new value from sensor.");
+        serverSocket.receive(receivePacket);
 
-        String output = "";
-        boolean continu = true;
-        while (continu)
-        {
-          // Create a packet to receive datagram
-          receivePacket = new DatagramPacket(receiveData, receiveData.length);
+        String request = new String(receivePacket.getData(), 0, receivePacket.getLength());
 
-          // Receive datagram from client
-          serverSocket.receive(receivePacket);
-
-          String request = new String(receivePacket.getData(), 0,
-              receivePacket.getLength());
-          output = output + request;
-          if (request.contains("|"))
-          {
-            continu = false;
-          }
-        }
-
-        // Get the IP address and port number of the client
+        /* Måske ikke relevant?
         InetAddress clientIPAddress = receivePacket.getAddress();
         int clientPort = receivePacket.getPort();
 
-        // Combine them into a string
-        String client_address =
-            clientIPAddress.getHostAddress() + ":" + clientPort;
+        String client_address = clientIPAddress.getHostAddress() + ":" + clientPort;
+        */
 
-        System.out.println("Client " + client_address + "> " + output);
+        try
+        {
+          String[] parts = request.split(":");
+          SensorType type = SensorType.valueOf(parts[0]);
+          double value = Double.parseDouble(parts[1]);
 
-        String reply = output.toUpperCase(); // Convert to upper case
-
-        System.out.println("Server> " + reply);
-
-        byte[] sendData = reply.getBytes();
-
-        // Create datagram to send to the client
-        DatagramPacket sendPacket = new DatagramPacket(sendData,
-            sendData.length,
-            clientIPAddress,
-            clientPort);
-
-        // Send datagram to client
-        serverSocket.send(sendPacket);
+          blindsService.sensorData(type, value);
+        }
+        catch (IllegalArgumentException e)
+        {
+          System.out.println("Could not read packet: " + e.getMessage());
+          Logger.getInstance().log("ERROR", "Could not read packet: " + e.getMessage());
+        }
       }
     }
     catch (IOException e)
     {
-      System.out.println("Error: Server socket IO failure.");
+      System.out.println("ERROR: " + e.getMessage());
+      Logger.getInstance().log("ERROR", e.getMessage());
+      throw new RuntimeException(e);
     }
   }
 }

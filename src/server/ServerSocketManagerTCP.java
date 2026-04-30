@@ -1,5 +1,8 @@
 package server;
 
+import model.BlindsStatus;
+import shared.logger.Logger;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -9,73 +12,107 @@ import java.net.Socket;
 
 public class ServerSocketManagerTCP
 {
+  private BlindsStatus status = BlindsStatus.CLOSED;
+  private Logger logger = Logger.getInstance();
+  private PrintWriter out;
+
   public ServerSocketManagerTCP(int port)
   {
+    logger.log("Info", "Server TCP Blinds server on port: " + port);
+    new Thread(() -> run(port)).start();
+  }
 
-    System.out.println("Starting Server...");
-    try
+  private void run(int port)
+  {
+
+    try (ServerSocket blindsSocket = new ServerSocket(port))
     {
-
-      // Create welcoming socket at port
-      ServerSocket welcomeSocket = new ServerSocket(port);
-
-      System.out.println("Waiting for a client to establish connection.");
-
       while (true)
       {
+        logger.log("Info", "Waiting for TCP command client...");
+        Socket socket = blindsSocket.accept();
 
-        try
-        {
-          // Wait for contact by client
-
-          System.out.println("Waiting for client...");
-          Socket socket = welcomeSocket.accept();
-
-          // Create input stream attached to the socket
-          BufferedReader in = new BufferedReader(
-              new InputStreamReader(socket.getInputStream()));
-
-          // Create output stream attached to the socket
-          PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-
-          // Note down the IP address and socket port of the client.
-          String client_address =
-              socket.getInetAddress().getHostAddress() + ":" + socket.getPort();
-          System.out.println(
-              "Connection established with client " + client_address);
-
-          while (true)
-          {
-            System.out.println("Waiting for new request from client.");
-            String request = in.readLine(); // Read line from client.
-
-            if (request == null)
-            {
-              System.out.println("Client disconnected: " + client_address);
-              break;
-            }
-            else
-            {
-              System.out.println("Client " + client_address + "> " + request);
-              String reply = request.toUpperCase(); // Convert to upper case
-              System.out.println("Server> " + reply);
-
-              out.println(reply); // Send line back to client.
-            }
-          }
-          socket.close();
-          System.out.println("Socket closed. Waiting for new client...");
-
-        }
-        catch (IOException e)
-        {
-          System.out.println("Error: Server socket IO failure");
-        }
+        new Thread(() -> handleClient(socket)).start();
       }
-    }   catch (IOException e)
+    }
+    catch (IOException e)
     {
-      System.out.println("error: server was closed");
+      logger.log("Error", "TCP server was closed. ");
+      throw new RuntimeException(e);
     }
 
   }
+
+  private void handleClient(Socket socket)
+  {
+    String clientAddress = socket.getInetAddress().getHostAddress() + ":" + socket.getPort();
+
+    logger.log("Info", "Connection established with client" + clientAddress);
+
+    try (BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));)
+    {
+      out = new PrintWriter(socket.getOutputStream(), true);
+      String request;
+
+      while ((request = in.readLine()) != null)
+      {
+        logger.log("Info", "Client " + clientAddress + "> " + request);
+
+        BlindsStatus reply = handleCommand(request);
+        out.println(reply);
+        logger.log("Info", "Server Replied " + reply);
+      }
+    }
+    catch (IOException e)
+    {
+      logger.log("Error", "Connection established with client " + clientAddress);
+
+      throw new RuntimeException(e);
+
+    }
+
+  }
+
+  private synchronized BlindsStatus handleCommand(String request)
+  {
+    try
+    {
+      BlindsStatus command = BlindsStatus.valueOf(request);
+
+      switch (command)
+      {
+        case OPEN ->
+        {
+          status = BlindsStatus.OPEN;
+          return status;
+        }
+
+        case CLOSED ->
+        {
+          status = BlindsStatus.CLOSED;
+          return status;
+        }
+
+      }
+    }
+    catch (IllegalArgumentException e)
+    {
+      logger.log("Error", "Failed to connect to client");
+      throw new RuntimeException(e);
+    }
+    return status;
+  }
+
+  public void sendCommand(
+      BlindsStatus status) // Håndterer sendCommand fra ServerSocketManagerUDP baseret på automatisk beregning på baggrund af sensordata
+  {
+    if (out == null)
+    {
+      logger.log("Error", "Blinds not connected..");
+      return;
+    }
+    logger.log("Info", "Sending command: " + status.name());
+    out.println(status.name());
+  }
+
 }

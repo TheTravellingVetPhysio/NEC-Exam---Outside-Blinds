@@ -1,9 +1,7 @@
 package client;
 
 import model.SensorType;
-import shared.logger.Logger;
 
-import javax.imageio.IIOException;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -15,7 +13,7 @@ public class ClientSocketManagerUDP implements SensorClient
   private int port;
   private InetAddress IPAddress;
 
-  private final int DATAGRAM_SIZE = 20;
+  private final int DATAGRAM_SIZE = 32;
 
   public ClientSocketManagerUDP(String host, int port)
   {
@@ -41,8 +39,7 @@ public class ClientSocketManagerUDP implements SensorClient
     }
     catch (IOException e)
     {
-      System.out.println(
-          "Error: Client failed to setup address and port to server.");
+      System.out.println("Error: Client failed to setup address and port to server.");
     }
   }
 
@@ -58,8 +55,7 @@ public class ClientSocketManagerUDP implements SensorClient
     {
       String message = type.name() + ":" + value;
       byte[] sendData = message.getBytes();
-      DatagramPacket packet = new DatagramPacket(sendData, sendData.length,
-          IPAddress, port);
+      DatagramPacket packet = new DatagramPacket(sendData, sendData.length, IPAddress, port);
       socket.send(packet);
     }
     catch (IOException e)

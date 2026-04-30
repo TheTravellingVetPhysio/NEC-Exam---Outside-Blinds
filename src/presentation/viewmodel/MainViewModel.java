@@ -6,6 +6,7 @@ public class MainViewModel
 {
   private final BlindsService blindsService;
 
+
   public MainViewModel(BlindsService blindsService)
   {
     this.blindsService = blindsService;
