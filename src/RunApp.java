@@ -20,14 +20,15 @@ public class RunApp extends Application
 
     MainViewModel viewModel = new MainViewModel(blindsService);
 
-    FXMLLoader loader = new FXMLLoader(getClass().getResource("@/fxml/BlindsDashboardView.fxml"));
+    FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/BlindsDashboardView.fxml"));
     Parent root = loader.load();
 
     MainController controller = loader.getController();
 
     controller.init(viewModel);
 
-    Scene scene = new Scene(root);
+    Scene scene = new Scene(root,1024, 760);
+
 
     scene.setFill(null);
     stage.setScene(scene);
