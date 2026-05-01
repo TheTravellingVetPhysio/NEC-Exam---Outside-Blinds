@@ -21,6 +21,8 @@ public class MainController implements Initializable
   @FXML private Label windLabel;
   @FXML private Label statusLabel;
   @FXML private Label modeLabel;
+  @FXML private Label blindsIconLabel;
+  @FXML private Label blindsTextLabel;
 
   private double xOffset;
   private double yOffset;
@@ -35,6 +37,8 @@ public class MainController implements Initializable
     windLabel.textProperty().bind(viewModel.windTextProperty());
     statusLabel.textProperty().bind(viewModel.statusTextProperty());
     modeLabel.textProperty().bind(viewModel.modeTextProperty());
+    blindsIconLabel.textProperty().bind(viewModel.blindsIconTextProperty());
+    blindsTextLabel.textProperty().bind(viewModel.blindsStateTextProperty());
   }
 
   @Override public void initialize(URL location, ResourceBundle resources)

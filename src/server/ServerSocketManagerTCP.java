@@ -1,6 +1,7 @@
 package server;
 
 import model.BlindsStatus;
+import model.MessageType;
 import shared.logger.Logger;
 
 import java.io.BufferedReader;
@@ -58,9 +59,16 @@ public class ServerSocketManagerTCP
       {
         logger.log("Info", "Client " + clientAddress + "> " + request);
 
-        BlindsStatus reply = handleCommand(request);
-        out.println(reply);
-        logger.log("Info", "Server Replied " + reply);
+        if (request.startsWith(MessageType.ACK.name()))
+        {
+          logger.log("Info", "Kvittering modtaget: " + request);
+        }
+        else if (request.startsWith(MessageType.COMMAND.name()))
+        {
+          BlindsStatus reply = handleCommand(request.split(":")[1]);
+          out.println(reply);
+          logger.log("Info", "Server Replied " + reply);
+        }
       }
     }
     catch (IOException e)
@@ -112,7 +120,7 @@ public class ServerSocketManagerTCP
       return;
     }
     logger.log("Info", "Sending command: " + status.name());
-    out.println(status.name());
+    out.println(MessageType.COMMAND + ":" + status.name());
   }
 
 }

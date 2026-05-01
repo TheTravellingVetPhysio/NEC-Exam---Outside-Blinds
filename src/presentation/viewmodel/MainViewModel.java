@@ -16,6 +16,8 @@ public class MainViewModel implements BlindsUIListener
   private final StringProperty windText = new SimpleStringProperty("0.0 m/s");
   private final StringProperty statusText = new SimpleStringProperty("CLOSED");
   private final StringProperty modeText = new SimpleStringProperty("AUTOMATIC");
+  private final StringProperty blindsIconText = new SimpleStringProperty("▥");
+  private final StringProperty blindsStateText = new SimpleStringProperty("Blinds are closed");
 
   public MainViewModel(BlindsService blindsService)
   {
@@ -39,7 +41,10 @@ public class MainViewModel implements BlindsUIListener
   public void onBlindsChanged(BlindsStatus status)
   {
     Platform.runLater(() -> {
-      statusText.set(status == BlindsStatus.CLOSED ? "CLOSED" : "OPEN");
+      boolean isOpen = status == BlindsStatus.OPEN;
+      statusText.set(isOpen ? "OPEN" : "CLOSED");
+      blindsIconText.set(isOpen ? "☰" : "▥");
+      blindsStateText.set(isOpen ? "Blinds are open" : "Blinds are closed");
       modeText.set(blindsService.getMode().toString());
     });
   }
@@ -47,7 +52,6 @@ public class MainViewModel implements BlindsUIListener
   @Override
   public void onSensorUpdated(double temperature, double sun, double wind)
   {
-    System.out.println("onSensorUpdated kaldt: " + temperature); // <-- tilføj denne
     Platform.runLater(() -> {
       temperatureText.set(String.format("%.1f °C", temperature));
       sunText.set(String.format("%.0f lux", sun));
@@ -61,4 +65,6 @@ public class MainViewModel implements BlindsUIListener
   public StringProperty windTextProperty()        { return windText; }
   public StringProperty statusTextProperty()      { return statusText; }
   public StringProperty modeTextProperty()        { return modeText; }
+  public StringProperty blindsIconTextProperty()  { return blindsIconText; }
+  public StringProperty blindsStateTextProperty() { return blindsStateText; }
 }

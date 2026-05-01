@@ -1,6 +1,7 @@
 package client;
 
 import model.BlindsStatus;
+import model.MessageType;
 import shared.listener.BlindsUIListener;
 
 import java.io.BufferedReader;
@@ -50,7 +51,8 @@ public class ClientSocketManagerTCP implements BlindsClient
     }
     catch (IOException e)
     {
-      System.out.println("Error: Client failed to establish connection to server.");
+      System.out.println(
+          "Error: Client failed to establish connection to server.");
     }
   }
 
@@ -66,20 +68,20 @@ public class ClientSocketManagerTCP implements BlindsClient
         socket.close();
       //      System.out.println("Client closed connection with server.");
 
-      in     = null;
-      out    = null;
+      in = null;
+      out = null;
       socket = null;
     }
     catch (IOException e)
     {
-      System.out.println("Error: Client failed to close the connection to server.");
+      System.out.println(
+          "Error: Client failed to close the connection to server.");
     }
   }
 
   @Override public void send(BlindsStatus status)
   {
-    out.println(status.name());
-
+    out.println(MessageType.ACK + ":" + status.name());
   }
 
   @Override public void receiveCommand()
@@ -90,21 +92,23 @@ public class ClientSocketManagerTCP implements BlindsClient
         String command;
         while ((command = in.readLine()) != null)
         {
-          switch (command)
+          if (command.startsWith(MessageType.COMMAND.name()))
           {
-            case "OPEN" ->
+            String action = command.split(":")[1]; // "OPEN" eller "CLOSED"
+            switch (action)
             {
-              // fysisk åbn persiennen
-              if (listener != null)
-                listener.onBlindsChanged(BlindsStatus.OPEN); //  notificerer UI
-              send(BlindsStatus.OPEN);   // kvitter tilbage til server
-            }
-            case "CLOSE" ->
-            {
-              // fysisk luk persiennen
-              if (listener != null)
-                listener.onBlindsChanged(BlindsStatus.CLOSED); // notificerer UI
-              send(BlindsStatus.CLOSED); // kvitter tilbage til server
+              case "OPEN" ->
+              {
+                if (listener != null)
+                  listener.onBlindsChanged(BlindsStatus.OPEN);
+                send(BlindsStatus.OPEN);
+              }
+              case "CLOSED" ->
+              {
+                if (listener != null)
+                  listener.onBlindsChanged(BlindsStatus.CLOSED);
+                send(BlindsStatus.CLOSED);
+              }
             }
           }
         }
@@ -113,8 +117,6 @@ public class ClientSocketManagerTCP implements BlindsClient
       {
         e.printStackTrace();
       }
-    }).
-
-          start();
+    }).start();
   }
 }
