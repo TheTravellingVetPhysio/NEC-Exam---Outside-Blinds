@@ -3,6 +3,7 @@ package presentation.view;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import presentation.viewmodel.MainViewModel;
@@ -15,14 +16,25 @@ public class MainController implements Initializable
   private MainViewModel viewModel;
 
   @FXML private VBox topBar;
+  @FXML private Label temperatureLabel;
+  @FXML private Label sunLabel;
+  @FXML private Label windLabel;
+  @FXML private Label statusLabel;
+  @FXML private Label modeLabel;
 
   private double xOffset;
   private double yOffset;
 
-
   public void init(MainViewModel viewModel)
   {
     this.viewModel = viewModel;
+
+    // Binder labels til ViewModel properties
+    temperatureLabel.textProperty().bind(viewModel.temperatureTextProperty());
+    sunLabel.textProperty().bind(viewModel.sunTextProperty());
+    windLabel.textProperty().bind(viewModel.windTextProperty());
+    statusLabel.textProperty().bind(viewModel.statusTextProperty());
+    modeLabel.textProperty().bind(viewModel.modeTextProperty());
   }
 
   @Override public void initialize(URL location, ResourceBundle resources)
@@ -39,9 +51,6 @@ public class MainController implements Initializable
     });
   }
 
-
-
-
   public void handleManualUp(ActionEvent actionEvent)
   {
     viewModel.onManualUp();
@@ -56,21 +65,4 @@ public class MainController implements Initializable
   {
     viewModel.onAutomatic();
   }
-
-
-  /* AI's forslag til at implementere listeneren
-  @FXML private ImageView blindsImage; // eller Label, Circle osv.
-
-  @Override public void onBlindsChanged(BlindsStatus status)
-  {
-    // Skal køres på JavaFX-tråden!
-    Platform.runLater(() -> {
-      switch (status)
-      {
-        case OPEN   -> blindsImage.setImage(new Image("open.png"));
-        case CLOSED -> blindsImage.setImage(new Image("closed.png"));
-      }
-    });
-  }
-   */
 }

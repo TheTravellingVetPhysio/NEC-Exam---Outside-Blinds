@@ -1,14 +1,12 @@
 import client.ClientSocket;
 import client.ClientSocketManagerTCP;
 
+// Kun til test - det hele startes op via RunApp
 public class MainClientTCP
 {
   public static void main(String[] args)
   {
-//    create client socket
-    ClientSocket socket = new ClientSocketManagerTCP("LocalHost", 6789);
-
-
-
+    ClientSocketManagerTCP socket = new ClientSocketManagerTCP("localhost", 6790);
+    socket.receiveCommand();
   }
 }
