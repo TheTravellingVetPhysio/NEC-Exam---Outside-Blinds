@@ -40,7 +40,7 @@
                     <VBox prefWidth="220.0" spacing="8.0" styleClass="glass-card">
                         <Label styleClass="card-label" text="Connection" />
                         <Label fx:id="connectionLabel" styleClass="card-value" text="ONLINE" />
-                        <Label styleClass="card-positive" text="TCP client connected" />
+                        <Label styleClass="card-positive" text="Connected to blinds" />
                     </VBox>
 
                     <VBox prefWidth="220.0" spacing="8.0" styleClass="glass-card">
