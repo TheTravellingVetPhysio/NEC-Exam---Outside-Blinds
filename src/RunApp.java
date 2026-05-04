@@ -1,5 +1,3 @@
-import client.BlindsClient;
-import client.ClientSocket;
 import client.ClientSocketManagerTCP;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -7,14 +5,18 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import model.DTO.SensorReadingDTO;
 import presentation.view.MainController;
 import presentation.viewmodel.MainViewModel;
+import server.SensorReadingConsumer;
 import server.ServerSocketManagerTCP;
 import server.ServerSocketManagerUDP;
 import service.BlindsService;
-import shared.listener.BlindsStateListener;
 import shared.listener.BlindsStateListenerService;
 import simulator.SensorSimulatorClient;
+
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 public class RunApp extends Application
 {
@@ -35,7 +37,12 @@ public class RunApp extends Application
     blindsService.setListener(stateListener);
 
     // 2. Start UDP og sensor-simulator (kører i egne tråde) EFTER listeners er sat
-    ServerSocketManagerUDP udp = new ServerSocketManagerUDP(6789, blindsService, tcp);
+    BlockingQueue<SensorReadingDTO> sensorQueue = new ArrayBlockingQueue<>(20);
+
+    new Thread(new SensorReadingConsumer(sensorQueue, blindsService), "Sensor-Consumer").start();
+
+    new ServerSocketManagerUDP(6789, sensorQueue);
+
     new SensorSimulatorClient().start();
 
     // 4. Forbind til persiennen og sæt listeners på viewModel
