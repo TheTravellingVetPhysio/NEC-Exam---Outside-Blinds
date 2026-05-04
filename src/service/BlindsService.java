@@ -61,7 +61,7 @@ public class BlindsService
       {
         currentWind = value;
         wind        = isWindTooStrong(value);
-        if (wind)
+        if (wind)     // Hvis vinden er for stærk tvinges den til mode AUTOMATIC
           mode = BlindsMode.AUTOMATIC;
       }
     }
