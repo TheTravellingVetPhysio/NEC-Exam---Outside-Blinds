@@ -1,3 +1,5 @@
+import client.BlindsClient;
+import client.ClientSocket;
 import client.ClientSocketManagerTCP;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -10,6 +12,7 @@ import presentation.viewmodel.MainViewModel;
 import server.ServerSocketManagerTCP;
 import server.ServerSocketManagerUDP;
 import service.BlindsService;
+import shared.listener.BlindsStateListener;
 import shared.listener.BlindsStateListenerService;
 import simulator.SensorSimulatorClient;
 

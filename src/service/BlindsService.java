@@ -30,7 +30,6 @@ public class BlindsService
 
   private BlindsMode mode = BlindsMode.AUTOMATIC;
 
-
   public void setListener(BlindsStateListener listener)
   {
     this.listener = listener;
@@ -48,34 +47,41 @@ public class BlindsService
   {
     switch (type)
     {
-      case TEMPERATURE -> {
+      case TEMPERATURE ->
+      {
         currentTemperature = value;
-        temperature = isTemperatureTooHigh(value);
+        temperature        = isTemperatureTooHigh(value);
       }
-      case SUN -> {
+      case SUN ->
+      {
         currentSun = value;
-        sun = isSunTooStrong(value);
+        sun        = isSunTooStrong(value);
       }
-      case WIND -> {
+      case WIND ->
+      {
         currentWind = value;
-        wind = isWindTooStrong(value);
-        if (wind) mode = BlindsMode.AUTOMATIC;
+        wind        = isWindTooStrong(value);
+        if (wind)
+          mode = BlindsMode.AUTOMATIC;
       }
     }
     notifyListener();
   }
 
-  public boolean isBlindsDown() {   // metoden serveren skal kalde
-    return switch (mode) {
+  public boolean isBlindsDown()
+  {   // metoden serveren skal kalde
+    return switch (mode)
+    {
       case MANUAL_DOWN -> true;
-      case MANUAL_UP   -> false;
-      case AUTOMATIC   -> isBlindsDownAutomatic();
+      case MANUAL_UP -> false;
+      case AUTOMATIC -> isBlindsDownAutomatic();
     };
   }
 
   public boolean isBlindsDownAutomatic()
   {
-    return sun && temperature && !wind;   // Persiennen kører kun ned hvis der er sol, det er varmt og der ikke er vind
+    return sun && temperature
+        && !wind;   // Persiennen kører kun ned hvis der er sol, det er varmt og der ikke er vind
   }
 
   private boolean isTemperatureTooHigh(Double value)
@@ -95,19 +101,49 @@ public class BlindsService
       windHistory.poll(); // fjern ældste fra køen
     }
     windHistory.add(value);
-    return
-        windHistory.stream().mapToDouble(Double::doubleValue).max().orElse(0.0)
-            > WIND_LIMIT;
+    return windHistory.stream().mapToDouble(Double::doubleValue).max().orElse(0.0) > WIND_LIMIT;
   }
 
   // Getters
-  public double getTemperature() { return currentTemperature; }
-  public double getSun()         { return currentSun; }
-  public double getWind()        { return currentWind; }
-  public BlindsMode getMode()    { return mode; }
+  public double getTemperature()
+  {
+    return currentTemperature;
+  }
+
+  public double getSun()
+  {
+    return currentSun;
+  }
+
+  public double getWind()
+  {
+    return currentWind;
+  }
+
+  public BlindsMode getMode()
+  {
+    return mode;
+  }
 
   // Set mode
-  public void setManualUp()   { mode = BlindsMode.MANUAL_UP; }
-  public void setManualDown() { mode = BlindsMode.MANUAL_DOWN; }
-  public void setAutomatic()  { mode = BlindsMode.AUTOMATIC; }
+  public void setManualUp()
+  {
+    mode = BlindsMode.MANUAL_UP;
+  }
+
+  public void setManualDown()
+  {
+    if (!isWindTooStrong(currentWind))
+    {
+      mode = BlindsMode.MANUAL_DOWN;
+    }
+    else {
+      mode = BlindsMode.AUTOMATIC;
+    }
+  }
+
+  public void setAutomatic()
+  {
+    mode = BlindsMode.AUTOMATIC;
+  }
 }
