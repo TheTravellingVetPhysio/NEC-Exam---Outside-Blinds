@@ -24,26 +24,30 @@ public class RunApp extends Application
 
     stage.initStyle(StageStyle.TRANSPARENT);
 
-    // 1. Start server-infrastruktur
+    // 1. Service
     BlindsService blindsService = new BlindsService();
-    ServerSocketManagerTCP tcp = new ServerSocketManagerTCP(6790);
 
-    // 2. ViewModel og listeners
+    // 2. ViewModel, da den bruges som uiListener
     MainViewModel viewModel = new MainViewModel(blindsService);
+
+    // 3. Serverinfrastruktur
+    ServerSocketManagerTCP tcp = new ServerSocketManagerTCP(6790, viewModel);
+
+    // 4. State listener
     BlindsStateListenerService stateListener = new BlindsStateListenerService(
         tcp, viewModel, blindsService);
     blindsService.setListener(stateListener);
 
-    // 2. Start UDP og sensor-simulator (kører i egne tråde) EFTER listeners er sat
+    // 5. UDP og sensor-simulator (kører i egne tråde) EFTER listeners er sat
     ServerSocketManagerUDP udp = new ServerSocketManagerUDP(6789, blindsService, tcp);
     new SensorSimulatorClient().start();
 
-    // 4. Forbind til persiennen og sæt listeners på viewModel
+    // 6. Klienter
     ClientSocketManagerTCP blindsClient = new ClientSocketManagerTCP("localhost", 6790);
     blindsClient.addListener(viewModel);
     blindsClient.receiveCommand();
 
-    // 5. FXML
+    // 7. FXML
     FXMLLoader loader = new FXMLLoader(
         getClass().getResource("/fxml/BlindsDashboardView.fxml"));
     Parent root = loader.load();

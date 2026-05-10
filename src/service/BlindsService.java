@@ -129,6 +129,7 @@ public class BlindsService
   public void setManualUp()
   {
     mode = BlindsMode.MANUAL_UP;
+    notifyListener();
   }
 
   public void setManualDown()
@@ -140,10 +141,12 @@ public class BlindsService
     else {
       mode = BlindsMode.AUTOMATIC;
     }
+      notifyListener();
   }
 
   public void setAutomatic()
   {
     mode = BlindsMode.AUTOMATIC;
+    notifyListener();
   }
 }

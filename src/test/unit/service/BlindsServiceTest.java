@@ -1,6 +1,5 @@
 package test.unit.service;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -97,6 +96,7 @@ public class BlindsServiceTest
   @Test void setManualUp_overridesAutomatic_returnsIsBlindsDownFalse()
   {
     // Arrange
+    blindsService.setAutomatic();
     blindsService.sensorData(SensorType.TEMPERATURE, 30);
     blindsService.sensorData(SensorType.SUN, 60000);
     blindsService.sensorData(SensorType.WIND, 3);

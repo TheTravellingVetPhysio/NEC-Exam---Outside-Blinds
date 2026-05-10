@@ -9,7 +9,7 @@ public class MainServerUDP
   public static void main(String[] args)
   {
     BlindsService blindsService = new BlindsService();
-    ServerSocketManagerTCP tcpManager = new ServerSocketManagerTCP(6790);
+    ServerSocketManagerTCP tcpManager = new ServerSocketManagerTCP(6790, null);
     new ServerSocketManagerUDP(6789, blindsService, tcpManager);
   }
 }

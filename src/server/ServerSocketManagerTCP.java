@@ -2,6 +2,7 @@ package server;
 
 import model.BlindsStatus;
 import model.MessageType;
+import shared.listener.BlindsUIListener;
 import shared.logger.Logger;
 
 import java.io.BufferedReader;
@@ -10,17 +11,39 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Arrays;
 
 public class ServerSocketManagerTCP
 {
-  private BlindsStatus status = BlindsStatus.CLOSED;
+  private BlindsStatus status = BlindsStatus.DOWN;
   private Logger logger = Logger.getInstance();
   private PrintWriter out;
+  private ServerSocket serverSocket;
+  private final BlindsUIListener uiListener;
+
+  public ServerSocketManagerTCP(int port, BlindsUIListener uiListener)
+  {
+    this.uiListener = uiListener;
+    logger.log("Info", "Server TCP Blinds server on port: " + port);
+    new Thread(() -> run(port)).start();
+  }
 
   public ServerSocketManagerTCP(int port)
   {
-    logger.log("Info", "Server TCP Blinds server on port: " + port);
-    new Thread(() -> run(port)).start();
+    this(port, null);
+  }
+
+  public void stop()
+  {
+    try
+    {
+      if (serverSocket != null && !serverSocket.isClosed())
+        serverSocket.close();
+    }
+    catch (IOException e)
+    {
+      logger.log("Error", "Failed to stop TCP server: " + e.getMessage());
+    }
   }
 
   private void run(int port)
@@ -28,6 +51,7 @@ public class ServerSocketManagerTCP
 
     try (ServerSocket blindsSocket = new ServerSocket(port))
     {
+      this.serverSocket = blindsSocket;
       while (true)
       {
         logger.log("Info", "Waiting for TCP command client...");
@@ -38,19 +62,23 @@ public class ServerSocketManagerTCP
     }
     catch (IOException e)
     {
-      logger.log("Error", "TCP server was closed. ");
-      throw new RuntimeException(e);
+      if (serverSocket != null && !serverSocket.isClosed())
+      {
+        logger.log("Error", "TCP server was closed. ");
+        throw new RuntimeException(e);
+      }
     }
-
   }
 
   private void handleClient(Socket socket)
   {
-    String clientAddress = socket.getInetAddress().getHostAddress() + ":" + socket.getPort();
+    String clientAddress =
+        socket.getInetAddress().getHostAddress() + ":" + socket.getPort();
 
     logger.log("Info", "Connection established with client" + clientAddress);
 
-    try (BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));)
+    try (BufferedReader in = new BufferedReader(
+        new InputStreamReader(socket.getInputStream()));)
     {
       out = new PrintWriter(socket.getOutputStream(), true);
       String request;
@@ -61,19 +89,26 @@ public class ServerSocketManagerTCP
 
         if (request.startsWith(MessageType.ACK.name()))
         {
+          BlindsStatus confirmedStatus = BlindsStatus.valueOf(
+              (request.split(":")[1]));
+          if (uiListener != null)
+            uiListener.onBlindsChanged(confirmedStatus);
+
           logger.log("Info", "Kvittering modtaget: " + request);
         }
-        else if (request.startsWith(MessageType.COMMAND.name()))
+        else if (request.startsWith(
+            MessageType.COMMAND.name()))    // TCP clienten sender ikke commands, kun ACK, så denne del er ikke relevant
         {
           BlindsStatus reply = handleCommand(request.split(":")[1]);
           out.println(reply);
-          logger.log("Info", "Server Replied " + reply);
+          logger.log("Info", "Server svarede: " + reply);
         }
       }
     }
     catch (IOException e)
     {
-      logger.log("Error", "Connection established with client " + clientAddress);
+      logger.log("Error",
+          "Connection established with client " + clientAddress);
 
       throw new RuntimeException(e);
 
@@ -81,23 +116,25 @@ public class ServerSocketManagerTCP
 
   }
 
-  private synchronized BlindsStatus handleCommand(String request)
+  private synchronized BlindsStatus handleCommand(
+      String request)   // Måske ikke relevant fordi TCP clienten ikke sender commands? Metoden kan slettes...
   {
     try
     {
       BlindsStatus command = BlindsStatus.valueOf(request);
 
+      // Forretningslogik, der hører til i BlindsService jvf Single Responsibility...
       switch (command)
       {
-        case OPEN ->
+        case UP ->
         {
-          status = BlindsStatus.OPEN;
+          status = BlindsStatus.UP;
           return status;
         }
 
-        case CLOSED ->
+        case DOWN ->
         {
-          status = BlindsStatus.CLOSED;
+          status = BlindsStatus.DOWN;
           return status;
         }
 
