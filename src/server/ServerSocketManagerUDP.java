@@ -1,6 +1,5 @@
 package server;
 
-import model.BlindsStatus;
 import model.SensorType;
 import service.BlindsService;
 import shared.logger.Logger;
