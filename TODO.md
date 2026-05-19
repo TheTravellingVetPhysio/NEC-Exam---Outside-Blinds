@@ -1,16 +1,11 @@
-MANGLER/TODO I KODEN: 
-- UI optimering (Mads)
-  - Open / closed skal ændres til up/down
-  - Blå knap er ikke "responsiv" - skifter ikke knap
-  - Størrelsen
-  - Ændre "TCP client connected" -> "Blinds connected"
-- Ændre algoritme, så sensorer værdier ligger tættere på limits (Julie)
+MANGLER/FEJL/TODO I KODEN: 
+- Fejl i UI når man klikker på den state, men i forvejen er på (Mads)
 
 Afleveringen: 
-- System overview (Julie)
+- Introduktion + System overview (Julie)
+- Client Roles
 - Network and Transportation Layer + Producer/Consumer
 - Message Framing and Message Types (Julie)
-- Client Roles
 - Sekvensdiagram (Julie)
 - Klassediagram (Mads)
-- Concurrency & Server-Side Handling
+- Concurrency & Server-Side Handling (Producer-Consumer her?)
