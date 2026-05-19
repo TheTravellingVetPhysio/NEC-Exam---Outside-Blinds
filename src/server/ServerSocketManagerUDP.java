@@ -1,17 +1,18 @@
 package server;
 
-import model.DTO.SensorReadingDTO;
+import model.BlindsStatus;
 import model.SensorType;
+import service.BlindsService;
 import shared.logger.Logger;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.util.concurrent.BlockingQueue;
 
 public class ServerSocketManagerUDP
 {
-  private final BlockingQueue<SensorReadingDTO> queue;
+  private final BlindsService blindsService;
+  private final ServerSocketManagerTCP serverSocketManagerTCP;
   private final int port;
   private DatagramSocket serverSocket;
 
@@ -24,7 +25,7 @@ public class ServerSocketManagerUDP
     this.blindsService = blindsService;
     this.serverSocketManagerTCP = serverSocketManagerTCP;
 
-    new Thread(this::run, "UDP-Producer").start();
+    new Thread(this::run).start();
   }
 
   public void stop()
@@ -40,8 +41,6 @@ public class ServerSocketManagerUDP
     {
       serverSocket = new DatagramSocket(port);
 
-    try (DatagramSocket serverSocket = new DatagramSocket(port))
-    {
       while (true)
       {
         byte[] receiveData = new byte[DATAGRAM_SIZE];
@@ -63,24 +62,10 @@ public class ServerSocketManagerUDP
         try
         {
           String[] parts = request.split(":");
-
-          if (parts.length != 2)
-          {
-            logger.log("ERROR", "Invalid UDP packet format: " + request);
-            continue;
-          }
-
           SensorType type = SensorType.valueOf(parts[0]);
           double value = Double.parseDouble(parts[1]);
 
-          SensorReadingDTO reading = new SensorReadingDTO(type, value);
-
-          queue.put(reading);
-
-          logger.log(
-              "INFO",
-              "UDP producer added reading to queue: " + reading
-          );
+          blindsService.sensorData(type, value);
         }
         catch (IllegalArgumentException e)
         {
@@ -98,11 +83,6 @@ public class ServerSocketManagerUDP
         throw new RuntimeException(e);
       }
       // Forventet lukning via stop()
-    }
-    catch (InterruptedException e)
-    {
-      Thread.currentThread().interrupt();
-      logger.log("ERROR", "UDP producer interrupted.");
     }
   }
 }
