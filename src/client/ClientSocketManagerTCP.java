@@ -99,14 +99,10 @@ public class ClientSocketManagerTCP implements BlindsClient
             {
               case "UP" ->
               {
-                if (listener != null)
-                  listener.onBlindsChanged(BlindsStatus.UP);
                 send(BlindsStatus.UP);
               }
               case "DOWN" ->
               {
-                if (listener != null)
-                  listener.onBlindsChanged(BlindsStatus.DOWN);
                 send(BlindsStatus.DOWN);
               }
             }

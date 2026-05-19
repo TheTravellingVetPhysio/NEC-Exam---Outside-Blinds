@@ -4,6 +4,7 @@ import model.BlindsStatus;
 import server.ServerSocketManagerTCP;
 import service.BlindsService;
 
+// Sender TCP kommando og opdaterer sensorvisning
 public class BlindsStateListenerService implements BlindsStateListener
 {
   private final ServerSocketManagerTCP tcp;
@@ -31,7 +32,6 @@ public class BlindsStateListenerService implements BlindsStateListener
 
     if (blindsUIListener != null)
     {
-      blindsUIListener.onBlindsChanged(status);
       blindsUIListener.onSensorUpdated(blindsService.getTemperature(),
           blindsService.getSun(), blindsService.getWind());
     }

@@ -61,7 +61,7 @@ public class BlindsService
       {
         currentWind = value;
         wind        = isWindTooStrong(value);
-        if (wind)
+        if (wind)     // Hvis vinden er for stærk tvinges den til mode AUTOMATIC
           mode = BlindsMode.AUTOMATIC;
       }
     }
@@ -129,6 +129,7 @@ public class BlindsService
   public void setManualUp()
   {
     mode = BlindsMode.MANUAL_UP;
+    notifyListener();
   }
 
   public void setManualDown()
@@ -140,10 +141,12 @@ public class BlindsService
     else {
       mode = BlindsMode.AUTOMATIC;
     }
+      notifyListener();
   }
 
   public void setAutomatic()
   {
     mode = BlindsMode.AUTOMATIC;
+    notifyListener();
   }
 }
