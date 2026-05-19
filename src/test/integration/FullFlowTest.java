@@ -1,7 +1,9 @@
 package test.integration;
 
 import model.BlindsStatus;
+import model.DTO.SensorReadingDTO;
 import org.junit.jupiter.api.*;
+import server.SensorReadingConsumer;
 import server.ServerSocketManagerTCP;
 import server.ServerSocketManagerUDP;
 import service.BlindsService;
@@ -36,7 +38,10 @@ public class FullFlowTest
         tcpManager, new BlindsUIListenerService(), blindsService);
     blindsService.setListener(listener);
 
-    udpManager = new ServerSocketManagerUDP(UDP_PORT, blindsService,
+    BlockingQueue<SensorReadingDTO> queue = new LinkedBlockingQueue<>();
+    new Thread(new SensorReadingConsumer(queue, blindsService)).start();
+
+    udpManager = new ServerSocketManagerUDP(UDP_PORT, queue,
         tcpManager);
 
     startFakeBlindsClient();

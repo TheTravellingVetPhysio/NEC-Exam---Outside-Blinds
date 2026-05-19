@@ -1,27 +1,29 @@
 package server;
 
+import model.DTO.SensorReadingDTO;
 import model.SensorType;
-import service.BlindsService;
 import shared.logger.Logger;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.util.concurrent.BlockingQueue;
 
 public class ServerSocketManagerUDP
 {
-  private final BlindsService blindsService;
   private final ServerSocketManagerTCP serverSocketManagerTCP;
   private final int port;
   private DatagramSocket serverSocket;
+  private final BlockingQueue<SensorReadingDTO> queue;
 
   private final int DATAGRAM_SIZE = 32;
 
-  public ServerSocketManagerUDP(int port, BlindsService blindsService,
+  public ServerSocketManagerUDP(int port,
+      BlockingQueue<SensorReadingDTO> queue,
       ServerSocketManagerTCP serverSocketManagerTCP)
   {
     this.port = port;
-    this.blindsService = blindsService;
+    this.queue = queue;
     this.serverSocketManagerTCP = serverSocketManagerTCP;
 
     new Thread(this::run).start();
@@ -64,13 +66,20 @@ public class ServerSocketManagerUDP
           SensorType type = SensorType.valueOf(parts[0]);
           double value = Double.parseDouble(parts[1]);
 
-          blindsService.sensorData(type, value);
+          queue.put(new SensorReadingDTO(type, value));
         }
         catch (IllegalArgumentException e)
         {
           System.out.println("Could not read packet: " + e.getMessage());
           Logger.getInstance()
               .log("ERROR", "Could not read packet: " + e.getMessage());
+        }
+        catch (InterruptedException e)
+        {
+          System.out.println("Could not read packet: " + e.getMessage());
+          Logger.getInstance()
+              .log("ERROR", "Could not read packet: " + e.getMessage());
+          throw new RuntimeException(e);
         }
       }
     }

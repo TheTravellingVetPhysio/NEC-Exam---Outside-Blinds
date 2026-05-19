@@ -40,16 +40,20 @@ public class RunApp extends Application
         tcp, viewModel, blindsService);
     blindsService.setListener(stateListener);
 
-    // 5. UDP og sensor-simulator (kører i egne tråde) EFTER listeners er sat
-    ServerSocketManagerUDP udp = new ServerSocketManagerUDP(6789, blindsService, tcp);
+    // 5. Queue - Producer/Consumer
+    BlockingQueue<SensorReadingDTO> queue = new ArrayBlockingQueue<>(100);
+    new Thread(new SensorReadingConsumer(queue, blindsService)).start();
+
+    // 6. UDP og sensor-simulator (kører i egne tråde) EFTER listeners er sat
+    ServerSocketManagerUDP udp = new ServerSocketManagerUDP(6789, queue, tcp);
     new SensorSimulatorClient().start();
 
-    // 6. Klienter
+    // 7. Klienter
     ClientSocketManagerTCP blindsClient = new ClientSocketManagerTCP("localhost", 6790);
     blindsClient.addListener(viewModel);
     blindsClient.receiveCommand();
 
-    // 7. FXML
+    // 8. FXML
     FXMLLoader loader = new FXMLLoader(
         getClass().getResource("/fxml/BlindsDashboardView.fxml"));
     Parent root = loader.load();

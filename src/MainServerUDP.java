@@ -12,8 +12,9 @@ public class MainServerUDP
 {
   public static void main(String[] args)
   {
+    BlockingQueue<SensorReadingDTO> queue = new ArrayBlockingQueue<>(100);
     BlindsService blindsService = new BlindsService();
     ServerSocketManagerTCP tcpManager = new ServerSocketManagerTCP(6790, null);
-    new ServerSocketManagerUDP(6789, blindsService, tcpManager);
+    new ServerSocketManagerUDP(6789, queue, tcpManager);
   }
 }
