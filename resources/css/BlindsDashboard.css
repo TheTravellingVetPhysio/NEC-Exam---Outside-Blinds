@@ -1,8 +1,8 @@
 .root-pane,
  .scroll-pane,
  .scroll-pane > .viewport {
-     -fx-background-color: #101827;
-     -fx-background: #101827;
+    -fx-background-color: #101827;
+    -fx-background: #101827;
  }
 
 .center-content {
@@ -204,8 +204,8 @@
 
 .scroll-pane.dashboard-scroll,
 .scroll-pane.dashboard-scroll > .viewport {
-    -fx-background-color: #101827;
-    -fx-background: #101827;
+    -fx-background-color: transparent;
+    -fx-background: transparent;
 }
 
 /* kun scrollbar */
@@ -243,8 +243,8 @@
 
 .scroll-pane.dashboard-scroll,
 .scroll-pane.dashboard-scroll > .viewport {
-    -fx-background-color: #101827;
-    -fx-background: #101827;
+    -fx-background-color: transparent;
+    -fx-background: transparent;
 }
 
 /* kun scrollbar */
@@ -278,4 +278,43 @@
     -fx-background-color: transparent;
     -fx-padding: 0;
     -fx-shape: "";
+}
+
+.window-button-close,
+.window-button-minimize {
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-cursor: hand;
+    -fx-font-size: 14px;
+    -fx-font-weight: 900;
+    -fx-padding: 6px 12px;
+}
+
+.window-button-close {
+    -fx-background-color: #dc2626;
+    -fx-text-fill: white;
+}
+
+.window-button-close:hover {
+    -fx-background-color: #ef4444;
+}
+
+.window-button-minimize {
+    -fx-background-color: rgba(255, 255, 255, 0.10);
+    -fx-text-fill: #e2e8f0;
+}
+
+.window-button-minimize:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.18);
+}
+
+.blinds-icon {
+    -fx-font-size: 52px;
+}
+
+.app-window {
+    -fx-background-color: #101827;
+    -fx-background-radius: 28px;
+    -fx-border-radius: 28px;
+    -fx-border-color: rgba(255, 255, 255, 0.12);
 }

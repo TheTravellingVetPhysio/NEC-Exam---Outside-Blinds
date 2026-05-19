@@ -3,20 +3,16 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import model.DTO.SensorReadingDTO;
 import presentation.view.MainController;
 import presentation.viewmodel.MainViewModel;
-import server.SensorReadingConsumer;
 import server.ServerSocketManagerTCP;
 import server.ServerSocketManagerUDP;
 import service.BlindsService;
 import shared.listener.BlindsStateListenerService;
 import simulator.SensorSimulatorClient;
-
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 
 public class RunApp extends Application
 {
@@ -62,7 +58,8 @@ public class RunApp extends Application
     controller.init(viewModel);
 
     Scene scene = new Scene(root, 1024, 760);
-    scene.setFill(null);
+    scene.setFill(Color.TRANSPARENT);
+    stage.initStyle(StageStyle.TRANSPARENT);
     stage.setScene(scene);
     stage.show();
   }

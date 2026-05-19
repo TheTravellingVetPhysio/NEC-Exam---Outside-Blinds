@@ -13,8 +13,6 @@ public class ClientSocketManagerUDP implements SensorClient
   private int port;
   private InetAddress IPAddress;
 
-  private final int DATAGRAM_SIZE = 32;
-
   public ClientSocketManagerUDP(String host, int port)
   {
     connect(host, port);
