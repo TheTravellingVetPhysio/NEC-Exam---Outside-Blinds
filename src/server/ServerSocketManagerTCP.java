@@ -13,7 +13,7 @@ import java.net.Socket;
 
 public class ServerSocketManagerTCP
 {
-  private BlindsStatus status = BlindsStatus.CLOSED;
+  private BlindsStatus status = BlindsStatus.DOWN;
   private Logger logger = Logger.getInstance();
   private PrintWriter out;
 
@@ -89,15 +89,15 @@ public class ServerSocketManagerTCP
 
       switch (command)
       {
-        case OPEN ->
+        case UP ->
         {
-          status = BlindsStatus.OPEN;
+          status = BlindsStatus.UP;
           return status;
         }
 
-        case CLOSED ->
+        case DOWN ->
         {
-          status = BlindsStatus.CLOSED;
+          status = BlindsStatus.DOWN;
           return status;
         }
 

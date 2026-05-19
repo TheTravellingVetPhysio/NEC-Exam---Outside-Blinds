@@ -94,20 +94,20 @@ public class ClientSocketManagerTCP implements BlindsClient
         {
           if (command.startsWith(MessageType.COMMAND.name()))
           {
-            String action = command.split(":")[1]; // "OPEN" eller "CLOSED"
+            String action = command.split(":")[1]; // "UP" eller "DOWN"
             switch (action)
             {
-              case "OPEN" ->
+              case "UP" ->
               {
                 if (listener != null)
-                  listener.onBlindsChanged(BlindsStatus.OPEN);
-                send(BlindsStatus.OPEN);
+                  listener.onBlindsChanged(BlindsStatus.UP);
+                send(BlindsStatus.UP);
               }
-              case "CLOSED" ->
+              case "DOWN" ->
               {
                 if (listener != null)
-                  listener.onBlindsChanged(BlindsStatus.CLOSED);
-                send(BlindsStatus.CLOSED);
+                  listener.onBlindsChanged(BlindsStatus.DOWN);
+                send(BlindsStatus.DOWN);
               }
             }
           }

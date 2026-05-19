@@ -21,7 +21,7 @@ public class BlindsStateListenerService implements BlindsStateListener
 
   @Override public void onStateChanged(boolean blindsDown)
   {
-    BlindsStatus status = blindsDown ? BlindsStatus.CLOSED : BlindsStatus.OPEN;
+    BlindsStatus status = blindsDown ? BlindsStatus.DOWN : BlindsStatus.UP;
 
     if (blindsDown != lastState)
     {
