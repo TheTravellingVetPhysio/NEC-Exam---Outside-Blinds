@@ -1,5 +1,4 @@
 MANGLER/TODO I KODEN: 
-- Producer-consumer? Vi tager det med, men kan forklare at det ikke er praktisk i dette tilfælde fordi vi gerne bare vil have seneste besked
 - UI optimering (Mads)
   - Open / closed skal ændres til up/down
   - Blå knap er ikke "responsiv" - skifter ikke knap

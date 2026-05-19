@@ -12,7 +12,7 @@ public class TemperatureSimulator implements SensorSimulator {
   @Override
   public double newValue() {
     currentValue += (random.nextDouble() - 0.5) * 2.0;
-    currentValue = Math.clamp(currentValue, -10.0, 40.0);
+    currentValue = Math.clamp(currentValue, 20.0, 430.0);
     return Math.round(currentValue * 10.0) / 10.0;
   }
 

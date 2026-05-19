@@ -12,7 +12,7 @@ public class WindSimulator implements SensorSimulator
   @Override public double newValue()
   {
     currentValue += (random.nextDouble() - 0.5) * 3.0;
-    currentValue = Math.clamp(currentValue, 0.0, 50.0);
+    currentValue = Math.clamp(currentValue, 5.0, 15.0);
     return Math.round(currentValue * 10.0) / 10.0;
   }
 
