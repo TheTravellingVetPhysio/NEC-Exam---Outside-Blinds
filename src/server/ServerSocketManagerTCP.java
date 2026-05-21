@@ -11,7 +11,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Arrays;
 
 public class ServerSocketManagerTCP
 {
@@ -96,13 +95,6 @@ public class ServerSocketManagerTCP
 
           logger.log("Info", "Kvittering modtaget: " + request);
         }
-        else if (request.startsWith(
-            MessageType.COMMAND.name()))    // TCP clienten sender ikke commands, kun ACK, så denne del er ikke relevant
-        {
-          BlindsStatus reply = handleCommand(request.split(":")[1]);
-          out.println(reply);
-          logger.log("Info", "Server svarede: " + reply);
-        }
       }
     }
     catch (IOException e)
@@ -111,41 +103,7 @@ public class ServerSocketManagerTCP
           "Connection established with client " + clientAddress);
 
       throw new RuntimeException(e);
-
     }
-
-  }
-
-  private synchronized BlindsStatus handleCommand(
-      String request)   // Måske ikke relevant fordi TCP clienten ikke sender commands? Metoden kan slettes...
-  {
-    try
-    {
-      BlindsStatus command = BlindsStatus.valueOf(request);
-
-      // Forretningslogik, der hører til i BlindsService jvf Single Responsibility...
-      switch (command)
-      {
-        case UP ->
-        {
-          status = BlindsStatus.UP;
-          return status;
-        }
-
-        case DOWN ->
-        {
-          status = BlindsStatus.DOWN;
-          return status;
-        }
-
-      }
-    }
-    catch (IllegalArgumentException e)
-    {
-      logger.log("Error", "Failed to connect to client");
-      throw new RuntimeException(e);
-    }
-    return status;
   }
 
   public void sendCommand(
