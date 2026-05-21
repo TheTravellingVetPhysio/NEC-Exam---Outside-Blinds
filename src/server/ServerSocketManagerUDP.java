@@ -53,13 +53,6 @@ public class ServerSocketManagerUDP
         String request = new String(receivePacket.getData(), 0,
             receivePacket.getLength());
 
-        /* Måske ikke relevant?
-        InetAddress clientIPAddress = receivePacket.getAddress();
-        int clientPort = receivePacket.getPort();
-
-        String client_address = clientIPAddress.getHostAddress() + ":" + clientPort;
-        */
-
         try
         {
           String[] parts = request.split(":");

@@ -11,6 +11,5 @@ public class BlindsUIListenerService implements BlindsUIListener
   public void onSensorUpdated(double temperature, double sun,
       double wind)
   {
-
   }
 }
