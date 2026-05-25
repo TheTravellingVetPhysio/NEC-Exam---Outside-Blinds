@@ -6,7 +6,9 @@ public class MainClientTCP
 {
   public static void main(String[] args)
   {
-    BlindsClient socket = new ClientSocketManagerTCP("localhost", 6790);
-    socket.receiveCommand();
+    String clientName = "BlindClient-" + System.currentTimeMillis();
+
+    BlindsClient clientSocket = new ClientSocketManagerTCP("localhost", 6790, clientName);
+    clientSocket.receiveCommand();
   }
 }
