@@ -51,7 +51,7 @@ public class RunApp extends Application
     new SensorSimulatorClient().start();
 
     // 7. Klienter
-    ClientSocketManagerTCP blindsClient = new ClientSocketManagerTCP("localhost", 6790);
+    ClientSocketManagerTCP blindsClient = new ClientSocketManagerTCP("localhost", 6790, "RunApp-BlindsClient" );
     blindsClient.addListener(viewModel);
     blindsClient.receiveCommand();
 

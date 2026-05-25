@@ -18,11 +18,13 @@ public class ClientSocketManagerTCP implements BlindsClient
   private PrintWriter out;
   private final String host;
   private final int port;
+  private final String clientName;
 
-  public ClientSocketManagerTCP(String host, int port)
+  public ClientSocketManagerTCP(String host, int port, String clientName)
   {
-    this.host = host;
-    this.port = port;
+    this.host       = host;
+    this.port       = port;
+    this.clientName = clientName;
     connect(host, port);
   }
 
@@ -51,8 +53,7 @@ public class ClientSocketManagerTCP implements BlindsClient
     }
     catch (IOException e)
     {
-      System.out.println(
-          "Error: Client failed to establish connection to server.");
+      System.out.println("Error: Client failed to establish connection to server.");
     }
   }
 
@@ -68,19 +69,20 @@ public class ClientSocketManagerTCP implements BlindsClient
         socket.close();
       //      System.out.println("Client closed connection with server.");
 
-      in = null;
-      out = null;
+      in     = null;
+      out    = null;
       socket = null;
     }
     catch (IOException e)
     {
-      System.out.println(
-          "Error: Client failed to close the connection to server.");
+      System.out.println("Error: Client failed to close the connection to server.");
     }
   }
 
   @Override public void send(BlindsStatus status)
   {
+    System.out.println("[" + clientName + "] Sending ACK: " + status.name());
+
     out.println(MessageType.ACK + ":" + status.name());
   }
 
@@ -92,6 +94,8 @@ public class ClientSocketManagerTCP implements BlindsClient
         String command;
         while ((command = in.readLine()) != null)
         {
+          System.out.println("[" + clientName + "] Received: " + command);
+
           if (command.startsWith(MessageType.COMMAND.name()))
           {
             String action = command.split(":")[1]; // "UP" eller "DOWN"
