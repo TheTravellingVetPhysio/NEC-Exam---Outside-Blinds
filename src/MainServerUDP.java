@@ -1,5 +1,5 @@
 import model.DTO.SensorReadingDTO;
-import server.ServerSocketManagerTCP;
+import server.SensorReadingConsumer;
 import server.ServerSocketManagerUDP;
 import service.BlindsService;
 
@@ -13,8 +13,13 @@ public class MainServerUDP
   public static void main(String[] args)
   {
     BlockingQueue<SensorReadingDTO> queue = new ArrayBlockingQueue<>(100);
+
     BlindsService blindsService = new BlindsService();
-    ServerSocketManagerTCP tcpManager = new ServerSocketManagerTCP(6790, null);
-    new ServerSocketManagerUDP(6789, queue, tcpManager);
+
+    new Thread(
+        new SensorReadingConsumer(queue, blindsService)
+    ).start();
+
+    new ServerSocketManagerUDP(6789, queue);
   }
 }

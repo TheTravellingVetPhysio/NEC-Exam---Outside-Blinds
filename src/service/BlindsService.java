@@ -134,15 +134,17 @@ public class BlindsService
 
   public void setManualDown()
   {
-    if (!isWindTooStrong(currentWind))
-    {
-      mode = BlindsMode.MANUAL_DOWN;
-    }
-    else {
-      mode = BlindsMode.AUTOMATIC;
-    }
+      if (!wind)
+      {
+        mode = BlindsMode.MANUAL_DOWN;
+      }
+      else
+      {
+        mode = BlindsMode.AUTOMATIC;
+      }
+
       notifyListener();
-  }
+    }
 
   public void setAutomatic()
   {
