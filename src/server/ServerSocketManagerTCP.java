@@ -11,20 +11,22 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ServerSocketManagerTCP
 {
   private BlindsStatus status = BlindsStatus.DOWN;
-  private Logger logger = Logger.getInstance();
-  private PrintWriter out;
+  private final Logger logger = Logger.getInstance();
+  private final List<PrintWriter> clients = new CopyOnWriteArrayList<>();
   private ServerSocket serverSocket;
   private final BlindsUIListener uiListener;
 
   public ServerSocketManagerTCP(int port, BlindsUIListener uiListener)
   {
     this.uiListener = uiListener;
-    logger.log("Info", "Server TCP Blinds server on port: " + port);
-    new Thread(() -> run(port)).start();
+    logger.log("INFO", "Server TCP Blinds server on port: " + port);
+    new Thread(() -> run(port), "TCP-Server").start();
   }
 
   public ServerSocketManagerTCP(int port)
@@ -41,31 +43,27 @@ public class ServerSocketManagerTCP
     }
     catch (IOException e)
     {
-      logger.log("Error", "Failed to stop TCP server: " + e.getMessage());
+      logger.log("ERROR", "Failed to stop TCP server: " + e.getMessage());
     }
   }
 
   private void run(int port)
   {
-
     try (ServerSocket blindsSocket = new ServerSocket(port))
     {
       this.serverSocket = blindsSocket;
-      while (true)
+
+      while (!blindsSocket.isClosed())
       {
-        logger.log("Info", "Waiting for TCP command client...");
+        logger.log("INFO", "Waiting for TCP command client...");
         Socket socket = blindsSocket.accept();
 
-        new Thread(() -> handleClient(socket)).start();
+        new Thread(() -> handleClient(socket), "TCP-Client-Handler").start();
       }
     }
     catch (IOException e)
     {
-      if (serverSocket != null && !serverSocket.isClosed())
-      {
-        logger.log("Error", "TCP server was closed. ");
-        throw new RuntimeException(e);
-      }
+      logger.log("INFO", "TCP server stopped.");
     }
   }
 
@@ -74,48 +72,83 @@ public class ServerSocketManagerTCP
     String clientAddress =
         socket.getInetAddress().getHostAddress() + ":" + socket.getPort();
 
-    logger.log("Info", "Connection established with client" + clientAddress);
+    logger.log("INFO", "Connection established with client " + clientAddress);
 
-    try (BufferedReader in = new BufferedReader(
-        new InputStreamReader(socket.getInputStream()));)
+    PrintWriter clientOut = null;
+
+    try (
+        BufferedReader in = new BufferedReader(
+            new InputStreamReader(socket.getInputStream()))
+    )
     {
-      out = new PrintWriter(socket.getOutputStream(), true);
+      clientOut = new PrintWriter(socket.getOutputStream(), true);
+      clients.add(clientOut);
+
       String request;
 
       while ((request = in.readLine()) != null)
       {
-        logger.log("Info", "Client " + clientAddress + "> " + request);
+        logger.log("INFO", "Client " + clientAddress + "> " + request);
 
         if (request.startsWith(MessageType.ACK.name()))
         {
-          BlindsStatus confirmedStatus = BlindsStatus.valueOf(
-              (request.split(":")[1]));
-          if (uiListener != null)
-            uiListener.onBlindsChanged(confirmedStatus);
+          String[] parts = request.split(":");
 
-          logger.log("Info", "Kvittering modtaget: " + request);
+          if (parts.length == 2)
+          {
+            BlindsStatus confirmedStatus = BlindsStatus.valueOf(parts[1]);
+            status = confirmedStatus;
+
+            if (uiListener != null)
+              uiListener.onBlindsChanged(confirmedStatus);
+
+            logger.log("INFO", "ACK received: " + request);
+          }
         }
       }
     }
     catch (IOException e)
     {
-      logger.log("Error",
-          "Connection established with client " + clientAddress);
+      logger.log("ERROR", "Connection lost with client " + clientAddress);
+    }
+    finally
+    {
+      if (clientOut != null)
+        clients.remove(clientOut);
 
-      throw new RuntimeException(e);
+      try
+      {
+        socket.close();
+      }
+      catch (IOException ignored)
+      {
+      }
     }
   }
 
-  public void sendCommand(
-      BlindsStatus status) // Håndterer sendCommand fra ServerSocketManagerUDP baseret på automatisk beregning på baggrund af sensordata
+  // Sender en TCP-kommando til alle forbundne blinds-klienter.
+  // Kaldes af BlindsStateListenerService når blinds ændrer tilstand.
+  public void sendCommand(BlindsStatus status)
   {
-    if (out == null)
+    if (clients.isEmpty())
     {
-      logger.log("Error", "Blinds not connected..");
+      logger.log("ERROR", "No blinds clients connected.");
       return;
     }
-    logger.log("Info", "Sending command: " + status.name());
-    out.println(MessageType.COMMAND + ":" + status.name());
+
+    this.status = status;
+    String message = MessageType.COMMAND + ":" + status.name();
+
+    logger.log("INFO", "Sending command: " + message);
+
+    for (PrintWriter client : clients)
+    {
+      client.println(message);
+    }
   }
 
+  public BlindsStatus getStatus()
+  {
+    return status;
+  }
 }

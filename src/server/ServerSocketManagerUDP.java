@@ -11,22 +11,18 @@ import java.util.concurrent.BlockingQueue;
 
 public class ServerSocketManagerUDP
 {
-  private final ServerSocketManagerTCP serverSocketManagerTCP;
   private final int port;
   private DatagramSocket serverSocket;
   private final BlockingQueue<SensorReadingDTO> queue;
 
   private final int DATAGRAM_SIZE = 32;
 
-  public ServerSocketManagerUDP(int port,
-      BlockingQueue<SensorReadingDTO> queue,
-      ServerSocketManagerTCP serverSocketManagerTCP)
+  public ServerSocketManagerUDP(int port, BlockingQueue<SensorReadingDTO> queue)
   {
     this.port = port;
     this.queue = queue;
-    this.serverSocketManagerTCP = serverSocketManagerTCP;
 
-    new Thread(this::run).start();
+    new Thread(this::run, "UDP-Producer").start();
   }
 
   public void stop()
@@ -56,6 +52,13 @@ public class ServerSocketManagerUDP
         try
         {
           String[] parts = request.split(":");
+
+          if (parts.length != 2)
+          {
+            Logger.getInstance().log("ERROR", "Invalid UDP packet format: " + request);
+            continue;
+          }
+
           SensorType type = SensorType.valueOf(parts[0]);
           double value = Double.parseDouble(parts[1]);
 

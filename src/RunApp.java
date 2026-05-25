@@ -1,3 +1,4 @@
+import client.BlindsClient;
 import client.ClientSocketManagerTCP;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -6,13 +7,18 @@ import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import model.DTO.SensorReadingDTO;
 import presentation.view.MainController;
 import presentation.viewmodel.MainViewModel;
+import server.SensorReadingConsumer;
 import server.ServerSocketManagerTCP;
 import server.ServerSocketManagerUDP;
 import service.BlindsService;
 import shared.listener.BlindsStateListenerService;
 import simulator.SensorSimulatorClient;
+
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 public class RunApp extends Application
 {
@@ -41,7 +47,7 @@ public class RunApp extends Application
     new Thread(new SensorReadingConsumer(queue, blindsService)).start();
 
     // 6. UDP og sensor-simulator (kører i egne tråde) EFTER listeners er sat
-    ServerSocketManagerUDP udp = new ServerSocketManagerUDP(6789, queue, tcp);
+    new ServerSocketManagerUDP(6789, queue);
     new SensorSimulatorClient().start();
 
     // 7. Klienter

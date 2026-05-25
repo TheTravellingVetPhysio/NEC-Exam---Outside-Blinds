@@ -2,9 +2,8 @@ package shared.logger;
 
 public class Logger
 {
-  public static Logger instance;
-  public LogOutput output;
-  private final String className = getClass().getSimpleName();
+  private static Logger instance;
+  private final LogOutput output;
 
   private Logger()
   {

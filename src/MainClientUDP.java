@@ -1,4 +1,5 @@
 import client.ClientSocketManagerUDP;
+import client.SensorClient;
 import model.SensorType;
 
 // Kun til test - det hele startes op via RunApp
@@ -6,7 +7,7 @@ public class MainClientUDP
 {
   public static void main(String[] args) throws InterruptedException
   {
-    ClientSocketManagerUDP socket = new ClientSocketManagerUDP("localhost", 6789);
+    SensorClient socket = new ClientSocketManagerUDP("localhost", 6789);
 
     while (true)
     {

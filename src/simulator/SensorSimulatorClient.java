@@ -1,6 +1,7 @@
 package simulator;
 
 import client.ClientSocketManagerUDP;
+import client.SensorClient;
 
 import java.util.List;
 
@@ -15,7 +16,7 @@ public class SensorSimulatorClient
   public void start() {
     for (SensorSimulator sim : sensorSimulators) {
       new Thread(() -> {
-        ClientSocketManagerUDP client = new ClientSocketManagerUDP("localhost", 6789);
+        SensorClient client = new ClientSocketManagerUDP("localhost", 6789);
         while (true) {
           try {
             client.send(sim.getType(), sim.newValue());

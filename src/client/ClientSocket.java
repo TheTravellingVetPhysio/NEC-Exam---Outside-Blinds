@@ -1,6 +1,5 @@
 package client;
 
-import model.SensorType;
 
 public interface ClientSocket
 {

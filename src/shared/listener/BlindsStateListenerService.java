@@ -32,8 +32,9 @@ public class BlindsStateListenerService implements BlindsStateListener
 
     if (blindsUIListener != null)
     {
-      blindsUIListener.onSensorUpdated(blindsService.getTemperature(),
-          blindsService.getSun(), blindsService.getWind());
+      blindsUIListener.onBlindsChanged(status);
+      blindsUIListener.onSensorUpdated(blindsService.getTemperature(), blindsService.getSun(),
+                                       blindsService.getWind());
     }
   }
 }
