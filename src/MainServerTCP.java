@@ -5,7 +5,7 @@ public class MainServerTCP
 {
   public static void main(String[] args)
   {
-    new ServerSocketManagerTCP(6790, null);
+    new ServerSocketManagerTCP(6790);
   }
 
 }

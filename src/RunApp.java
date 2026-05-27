@@ -14,6 +14,7 @@ import server.SensorReadingConsumer;
 import server.ServerSocketManagerTCP;
 import server.ServerSocketManagerUDP;
 import service.BlindsService;
+import shared.listener.BlindsServiceUIListener;
 import shared.listener.BlindsStateListenerService;
 import simulator.SensorSimulatorClient;
 
@@ -35,7 +36,7 @@ public class RunApp extends Application
     MainViewModel viewModel = new MainViewModel(blindsService);
 
     // 3. Serverinfrastruktur
-    ServerSocketManagerTCP tcp = new ServerSocketManagerTCP(6790, viewModel);
+    ServerSocketManagerTCP tcp = new ServerSocketManagerTCP(6790, (BlindsServiceUIListener) viewModel);
 
     // 4. State listener
     BlindsStateListenerService stateListener = new BlindsStateListenerService(
@@ -51,7 +52,7 @@ public class RunApp extends Application
     new SensorSimulatorClient().start();
 
     // 7. Klienter
-    ClientSocketManagerTCP blindsClient = new ClientSocketManagerTCP("localhost", 6790, "RunApp-BlindsClient" );
+    BlindsClient blindsClient = new ClientSocketManagerTCP("localhost", 6790, "RunApp-BlindsClient" );
     blindsClient.addListener(viewModel);
     blindsClient.receiveCommand();
 

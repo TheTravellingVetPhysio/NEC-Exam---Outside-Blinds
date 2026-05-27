@@ -8,16 +8,16 @@ import service.BlindsService;
 public class BlindsStateListenerService implements BlindsStateListener
 {
   private final ServerSocketManagerTCP tcp;
-  private BlindsUIListener blindsUIListener;
+  private BlindsServiceUIListener blindsServiceUIListener;
   private final BlindsService blindsService;
   private boolean lastState;
 
   public BlindsStateListenerService(ServerSocketManagerTCP tcp,
-      BlindsUIListener blindsUIListener, BlindsService blindsService)
+                                    BlindsServiceUIListener blindsServiceUIListener, BlindsService blindsService)
   {
-    this.tcp = tcp;
-    this.blindsUIListener = blindsUIListener;
-    this.blindsService = blindsService;
+    this.tcp                     = tcp;
+    this.blindsServiceUIListener = blindsServiceUIListener;
+    this.blindsService           = blindsService;
   }
 
   @Override public void onStateChanged(boolean blindsDown)
@@ -30,11 +30,11 @@ public class BlindsStateListenerService implements BlindsStateListener
       lastState = blindsDown;
     }
 
-    if (blindsUIListener != null)
+    if (blindsServiceUIListener != null)
     {
-      blindsUIListener.onBlindsChanged(status);
-      blindsUIListener.onSensorUpdated(blindsService.getTemperature(), blindsService.getSun(),
-                                       blindsService.getWind());
+      blindsServiceUIListener.onBlindsChanged(status);
+      blindsServiceUIListener.onSensorUpdated(blindsService.getTemperature(), blindsService.getSun(),
+                                              blindsService.getWind());
     }
   }
 }

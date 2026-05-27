@@ -2,7 +2,7 @@ package client;
 
 import model.BlindsStatus;
 import model.MessageType;
-import shared.listener.BlindsUIListener;
+import shared.listener.BlindsServiceUIListener;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,7 +12,7 @@ import java.net.Socket;
 
 public class ClientSocketManagerTCP implements BlindsClient
 {
-  private BlindsUIListener listener;
+  private BlindsServiceUIListener listener;
   private Socket socket;
   private BufferedReader in;
   private PrintWriter out;
@@ -28,7 +28,7 @@ public class ClientSocketManagerTCP implements BlindsClient
     connect(host, port);
   }
 
-  public void addListener(BlindsUIListener listener)
+  public void addListener(BlindsServiceUIListener listener)
   {
     this.listener = listener;
   }

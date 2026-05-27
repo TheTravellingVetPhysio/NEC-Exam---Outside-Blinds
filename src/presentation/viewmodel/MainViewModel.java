@@ -5,9 +5,9 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import model.BlindsStatus;
 import service.BlindsService;
-import shared.listener.BlindsUIListener;
+import shared.listener.BlindsServiceUIListener;
 
-public class MainViewModel implements BlindsUIListener
+public class MainViewModel implements BlindsServiceUIListener
 {
   private final BlindsService blindsService;
 

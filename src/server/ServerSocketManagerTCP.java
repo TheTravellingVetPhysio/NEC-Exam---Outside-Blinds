@@ -2,7 +2,7 @@ package server;
 
 import model.BlindsStatus;
 import model.MessageType;
-import shared.listener.BlindsUIListener;
+import shared.listener.BlindsServiceUIListener;
 import shared.logger.Logger;
 
 import java.io.BufferedReader;
@@ -20,9 +20,9 @@ public class ServerSocketManagerTCP
   private final Logger logger = Logger.getInstance();
   private final List<PrintWriter> clients = new CopyOnWriteArrayList<>();
   private ServerSocket serverSocket;
-  private final BlindsUIListener uiListener;
+  private final BlindsServiceUIListener uiListener;
 
-  public ServerSocketManagerTCP(int port, BlindsUIListener uiListener)
+  public ServerSocketManagerTCP(int port, BlindsServiceUIListener uiListener)
   {
     this.uiListener = uiListener;
     logger.log("INFO", "Server TCP Blinds server on port: " + port);
