@@ -20,16 +20,13 @@ public class ClientSocketManagerUDP implements SensorClient
 
   @Override public void connect(String host, int port)
   {
-    // Disconnect from existing connection (if exist)
     if (socket != null)
       disconnect();
 
     try
     {
-      // Create client socket
       socket = new DatagramSocket();
 
-      // Translate the hostname to IP using DNS
       IPAddress = InetAddress.getByName(host);
       this.port = port;
 
